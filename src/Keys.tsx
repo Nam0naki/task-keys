@@ -8,7 +8,6 @@ interface KeysProps {
 
 export function Keys({ initialData, sorting }: KeysProps) {
   const [items, setItems] = useState<IItem[]>(initialData);
-  const [sortDirection, setSortDirection] = useState<'ASC' | 'DESC'>(sorting);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [draftName, setDraftName] = useState<string>('');
 
@@ -16,19 +15,11 @@ export function Keys({ initialData, sorting }: KeysProps) {
     setItems(initialData);
   }, [initialData]);
 
-  useEffect(() => {
-    setSortDirection(sorting);
-  }, [sorting]);
-
   const sortedItems = useMemo(() => {
     return [...items].sort((a, b) =>
-      sortDirection === 'ASC' ? a.id - b.id : b.id - a.id
+      sorting === 'ASC' ? a.id - b.id : b.id - a.id
     );
-  }, [items, sortDirection]);
-
-  const handleToggleSorting = () => {
-    setSortDirection((prev) => (prev === 'ASC' ? 'DESC' : 'ASC'));
-  };
+  }, [items, sorting]);
 
   const handleStartEditing = (item: IItem) => {
     setEditingId(item.id);
@@ -62,28 +53,22 @@ export function Keys({ initialData, sorting }: KeysProps) {
   };
 
   return (
-    <div>
-      <button type="button" onClick={handleToggleSorting}>
-        Change sorting
-      </button>
-
-      <ul>
-        {sortedItems.map((item) => (
-          <li key={item.id}>
-            {editingId === item.id ? (
-              <input
-                type="text"
-                value={draftName}
-                autoFocus
-                onChange={(e) => setDraftName(e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, item.id)}
-              />
-            ) : (
-              <span onClick={() => handleStartEditing(item)}>{item.name}</span>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul>
+      {sortedItems.map((item) => (
+        <li key={item.id}>
+          {editingId === item.id ? (
+            <input
+              type="text"
+              value={draftName}
+              autoFocus
+              onChange={(e) => setDraftName(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, item.id)}
+            />
+          ) : (
+            <span onClick={() => handleStartEditing(item)}>{item.name}</span>
+          )}
+        </li>
+      ))}
+    </ul>
   );
 }
